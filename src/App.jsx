@@ -1,30 +1,52 @@
 import React, { useState } from 'react';
 import './App.scss';
+import cn from 'classnames';
 
-// import usersFromServer from './api/users';
+import usersFromServer from './api/users';
 import categoriesFromServer from './api/categories';
 import productsFromServer from './api/products';
 
-function getCategory(categories, product) {
-  return categories.find(c => product.categoryId === c.id);
-}
+// function getCategory(categories, product) {
+//   return categories.find(c => product.categoryId === c.id);
+// }
 
 // function getUsers(users, product) {
 //   return users.find(u => product.category.id === u.id);
 // }
 
+// const preparedProducts = productsFromServer.map(product => ({
+//   ...product,
+//   category: getCategory(categoriesFromServer, product), // find by product.categoryId
+//   user: getUsers(usersFromServer, product), // find by category.ownerId
+// }));
+
+function getCategoryById(categories, categoryId) {
+  return categories.find(c => c.id === categoryId);
+}
+
+function getUserById(users, userId) {
+  return users.find(u => u.id === userId);
+}
+
+const preparedProducts = productsFromServer.map((product) => {
+  const productCategory = getCategoryById(
+    categoriesFromServer, product.categoryId,
+  );
+  const productUser = getUserById(usersFromServer, productCategory.ownerId);
+
+  return {
+    ...product,
+    category: productCategory,
+    user: productUser,
+  };
+});
+
 export const App = () => {
   // eslint-disable-next-line no-unused-vars
   const [currentProduct, setCurrentProduct] = useState('');
 
-  const preparedProducts = productsFromServer.map(product => ({
-    ...product,
-    category: getCategory(categoriesFromServer, product), // find by product.categoryId
-    // user: getUsers(usersFromServer, product), // find by category.ownerId
-  }));
-
   // eslint-disable-next-line no-console
-  console.log(preparedProducts);
+  // console.log(preparedProducts);
 
   return (
     <div className="section">
@@ -226,9 +248,12 @@ export const App = () => {
 
                     <td
                       data-cy="ProductUser"
-                      className="has-text-link"
+                      className={cn('has-text-link', {
+                        'has-text-link': product.user.sex === 'm',
+                        'has-text-danger': product.user.sex === 'f',
+                      })}
                     >
-                      {/* {product.user.name} */}
+                      {product.user.name}
                     </td>
                   </tr>
                 );
