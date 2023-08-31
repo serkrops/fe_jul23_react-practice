@@ -4,7 +4,6 @@ import './App.scss';
 // import usersFromServer from './api/users';
 import categoriesFromServer from './api/categories';
 import productsFromServer from './api/products';
-// import products from './api/products';
 
 function getCategory(categories, product) {
   return categories.find(c => product.categoryId === c.id);
